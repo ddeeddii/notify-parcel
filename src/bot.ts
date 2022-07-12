@@ -109,7 +109,7 @@ function checkParcelStatus() {
 	})	
 }
 
-checkParcelStatus()
+// checkParcelStatus()
 
 // Setup automatic updates
 import { parse } from '@lukeed/ms'
