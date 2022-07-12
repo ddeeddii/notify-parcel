@@ -15,7 +15,7 @@ const client: Client = new Discord.Client({ intents: myIntents })
 client.login(config.token)
 
 client.on('ready', () => {
-	console.log('Discord Loaded!'.rainbow)
+	console.log('Discord loaded'.rainbow)
 })
 
 // Initalize & setup database
@@ -42,6 +42,10 @@ function initDatabase(){
 
 initDatabase()
 
+function arraysEqual(a: Array<any>, b: Array<any>) {
+	return JSON.stringify(a) == JSON.stringify(b)
+}
+
 // Main function
 function checkParcelStatus() {
 	console.log('\nChecking parel status..'.red)
@@ -49,40 +53,54 @@ function checkParcelStatus() {
 		const savedEvents = db.getData('/events')
 		if(savedEvents.length != events.length){
 			console.log('Length mismatch!'.rainbow)
-						
-			const latestEvent = events[0]
-			
-			// Notify user
-			client.users.fetch(config.user).then(function(user) {
-				user.send({	
-				'content': '😎',
-				'embeds': [{
-					'title': 'New parcel update!',
-					'description': '',
-					'color': 0xff0000, // Red
-					'fields': [
-						{
-						'name': 'Date',
-						'value': latestEvent[0]
-						},
-				
-						{
-						'name': 'Hour',
-						'value': latestEvent[1]
-						},
-				
-						{
-						'name': 'Description',
-						'value': latestEvent[2]
-						},
-				
-						{
-						'name': 'Location',
-						'value': latestEvent[3] == '' ? 'None' : latestEvent[3]
-						}
-					]
-				}]})
+		
+			const newEvents: Array<any> = []
+
+			savedEvents.forEach((newEvent: Array<string>) => {
+				newEvents.push(newEvent)				
+				for(const oldEvent of events){					
+					if(arraysEqual(newEvent, oldEvent)){						
+						newEvents.pop()						
+						break
+					}
+				}
 			})
+						
+			//Notify user
+			client.users.fetch(config.user).then(function(user) {
+				newEvents.forEach(newEvent => {
+					user.send({	
+						'content': '😎',
+						'embeds': [{
+							'title': 'New parcel update!',
+							'description': '',
+							'color': 0xff0000, // Red
+							'fields': [
+								{
+								'name': 'Date',
+								'value': newEvent[0]
+								},
+						
+								{
+								'name': 'Hour',
+								'value': newEvent[1]
+								},
+						
+								{
+								'name': 'Description',
+								'value': newEvent[2]
+								},
+						
+								{
+								'name': 'Location',
+								'value': newEvent[3] == '' ? 'None' : newEvent[3]
+								}
+							]
+						}]})
+				})
+			})
+
+			db.push('/events', events)
 		} else {
 			console.log('No changes')
 		}
