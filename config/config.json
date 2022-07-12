@@ -1,0 +1,6 @@
+{
+    "token": "discord-bot-token-here",
+    "user": "discord-user-id-here",
+    "url": "dpd-tracker-url-here",
+    "interval": "30m"
+}
