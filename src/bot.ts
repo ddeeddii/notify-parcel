@@ -48,7 +48,7 @@ function arraysEqual(a: Array<any>, b: Array<any>) {
 
 // Main function
 function checkParcelStatus() {
-	console.log('\nChecking parel status..'.red)
+	console.log('\nChecking parcel status..'.red)
 	getParcelEvents().then(events => {
 		const savedEvents = db.getData('/events')
 		if(savedEvents.length != events.length){
@@ -56,9 +56,9 @@ function checkParcelStatus() {
 		
 			const newEvents: Array<any> = []
 
-			savedEvents.forEach((newEvent: Array<string>) => {
+			events.forEach((newEvent: Array<string>) => {
 				newEvents.push(newEvent)				
-				for(const oldEvent of events){					
+				for(const oldEvent of savedEvents){					
 					if(arraysEqual(newEvent, oldEvent)){						
 						newEvents.pop()						
 						break
@@ -66,6 +66,8 @@ function checkParcelStatus() {
 				}
 			})
 						
+			if(newEvents.length < 1) { return }
+
 			//Notify user
 			client.users.fetch(config.user).then(function(user) {
 				newEvents.forEach(newEvent => {
@@ -78,17 +80,17 @@ function checkParcelStatus() {
 							'fields': [
 								{
 								'name': 'Date',
-								'value': newEvent[0]
+								'value': newEvent[0] == '' ? 'None' : newEvent[0]
 								},
 						
 								{
 								'name': 'Hour',
-								'value': newEvent[1]
+								'value': newEvent[1] == '' ? 'None' : newEvent[1]
 								},
 						
 								{
 								'name': 'Description',
-								'value': newEvent[2]
+								'value': newEvent[2] == '' ? 'None' : newEvent[2]
 								},
 						
 								{
@@ -106,6 +108,8 @@ function checkParcelStatus() {
 		}
 	})	
 }
+
+checkParcelStatus()
 
 // Setup automatic updates
 import { parse } from '@lukeed/ms'
